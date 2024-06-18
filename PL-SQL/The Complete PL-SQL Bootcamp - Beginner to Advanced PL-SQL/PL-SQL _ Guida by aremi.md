@@ -86,7 +86,10 @@ END SalutaUtente;
 
 I blocchi con nome come le procedure devono essere prima creati nel database e poi possono essere eseguiti con una chiamata separata.
 
-## Naming Conventions per PL/SQL:
+---
+
+## Variabili
+### Naming Conventions per PL/SQL:
 Le convenzioni di denominazione in PL/SQL sono importanti per mantenere il codice organizzato e facilmente comprensibile. Ecco alcune linee guida generali¹²⁴⁵:
 
 - **Lunghezza**: I nomi devono essere brevi ma descrittivi, il limite massimo è di 30 caratteri.
@@ -135,7 +138,7 @@ PACKAGE pkg_employee_management IS
 END pkg_employee_management;
 ```
 
-## Variabili e Bind-Variable; differenza:
+### Variabili e Bind-Variable; differenza:
 Le variabili normali sono utilizzate all'interno del codice PL/SQL per memorizzare dati temporanei. Sono dichiarate nella sezione di dichiarazione di un blocco PL/SQL e il loro scopo è di contenere valori che possono essere modificati durante l'esecuzione del blocco.
 
 Le variabili di bind, invece, sono utilizzate per passare valori da e verso il database in istruzioni SQL dinamiche o in blocchi PL/SQL. Queste variabili agiscono come segnaposto all'interno di un'istruzione SQL o PL/SQL e sono legate a valori effettivi al momento dell'esecuzione. L'uso delle variabili di bind può migliorare le prestazioni perché permette al database di riutilizzare i piani di esecuzione SQL.
@@ -170,11 +173,41 @@ END;
 
 Nel primo esempio, `v_empno` è una variabile normale che viene automaticamente trattata come una variabile di bind dal compilatore PL/SQL. Nel secondo esempio, `v_empno` è esplicitamente utilizzata come una variabile di bind in un'istruzione SQL dinamica.
 
-## Variabili
+### Variabili, altre cose da sapere
 - La concatenazione tra due stringhe avviene per mezzo dell'operatore `||`. Per esempio `v_text := ' PL\SQL' || ' COURSE';`
 - NUMBER(*precision*, *scale*) è un tipo primitivo in cui *precision* indica il minimo del numero totale di cifre che può contenere la variabile, mentre *scale* il minimo della precisione decimale. Per esempio `v_number NUMBER(2, 2) := 50.12` darà errore perchè il numero totale di cifre è almeno 4 (si considera anche la parte decimale), la dichiarazione corretta sarebbe `v_number NUMBER(4, 2) := 50.12`, mentre `v_number NUMBER(4, 1) := 50.12` tronca alla prima cifra decimale `50.1`.
 - PLS_INTEGER, BINARY_FLOAT e BINARY_DOUBLE: questi formati sono più veloci di NUMBER(p, s), all'assegnazione di un BINARY_FLOAT o BINARY_DOUBLE bisogna inserire 'f' o 'd' dopo la cifra `v_number BINARY_FLOAT := 50.12f`.
 - `SYSDATE` e `SYSTIMESTAMP` ritornano da data di adesso con diversa precisione.
 - DATE: contiene la data gg-MM-yy, `v_date DATE NOT NULL := SYSDATE`. 
 - TIMESTAMP: contiene la data gg-MM-yy hh:mm:ss.sss, `v_date TIMESTAMP NOT NULL := SYSTIMESTAMP`. 
-- INTERVAL è un tipo primitivo che serve per misurare quanti giorni in secondi o mesi in anni sono passati. Per esempio 
+- INTERVAL è un tipo primitivo che serve per misurare quanti giorni in secondi o mesi in anni sono passati. Per esempio
+
+### Attributo `%TYPE`
+In PL/SQL, `%TYPE` è un attributo che consente di dichiarare una variabile per essere dello stesso tipo di dati di una colonna di una tabella del database o di un'altra variabile già dichiarata. Questo è particolarmente utile per mantenere la consistenza dei tipi di dati e per adattarsi automaticamente ai cambiamenti di schema delle tabelle del database.  
+<big><u>Attenzione</u></big>, se la colonna è dichiarata come `NOT NULL` la variabile dichiarata con `%TYPE` può comunque contenere `NULL`.
+
+Ecco alcuni punti chiave su `%TYPE`:
+- **Consistenza dei tipi di dati**: Utilizzando `%TYPE`, puoi assicurarti che la variabile sia sempre dello stesso tipo della colonna a cui si riferisce¹.
+- **Manutenibilità**: Se il tipo di dati di una colonna cambia, non devi modificare manualmente il tipo di dati delle variabili PL/SQL correlate¹.
+- **Leggibilità del codice**: Rende il codice più leggibile e chiaro, poiché è evidente a quale colonna di tabella si riferisce la variabile¹.
+
+La sintassi per usare `%TYPE` è la seguente:
+```plsql
+DECLARE
+  v_variable table.column_name%TYPE;
+BEGIN
+  -- Il tuo codice PL/SQL qui
+END;
+```
+
+Per esempio, se hai una tabella `dipendenti` con una colonna `stipendio` di tipo `NUMBER`, puoi dichiarare una variabile `v_stipendio` che abbia lo stesso tipo di dati della colonna `stipendio` così:
+```plsql
+DECLARE
+  v_stipendio dipendenti.stipendio%TYPE;
+BEGIN
+  -- Il tuo codice PL/SQL qui
+END;
+```
+
+In questo modo, `v_stipendio` sarà di tipo `NUMBER`, e se in futuro il tipo di dati della colonna `stipendio` cambiasse, `v_stipendio` si adatterebbe automaticamente al nuovo tipo.
+
