@@ -1,0 +1,10 @@
+_app
+_bin
+_lib
+obj
+.vs
+raylib-master
+*.bat
+*.exe
+*.lua
+*.osx

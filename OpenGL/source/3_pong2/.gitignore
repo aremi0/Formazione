@@ -1,0 +1,11 @@
+.vs
+_app
+_bin
+_build
+_lib
+raylib-master
+premake5
+*.exe
+*.lua
+*.osx
+*.bat
